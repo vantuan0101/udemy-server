@@ -7,32 +7,51 @@ assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## MongoDB
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+<!--
+Describe Database schema changes 
+ -->
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+```javascript
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+```
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+## GraphQL
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
+<!--
+Describe graphQL schema changes 
+ -->
 
-**Additional context**
-Add any other context about the problem here.
+```gql
+```
+
+## gRPC
+
+<!--
+Describe gRPC methods and message changes
+ -->
+
+- Modify `file_name.proto`
+  - Describe the gRPC methods and message changes
+
+```proto
+```
+
+## Implementation
+
+<!--
+Describe the logic changes
+ -->
+
+## Environment variables
+
+<!--
+List the new/changed environment variables (using markdown list indent)
+ -->
+
+## Related Issues
+
+<!--
+URL of the related issues (using markdown list indent)
+ -->

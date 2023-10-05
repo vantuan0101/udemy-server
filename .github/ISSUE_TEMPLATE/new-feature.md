@@ -1,6 +1,6 @@
 ---
-name: New Issue
-about: New Issue
+name: New Feature
+about: Suggest an idea for this project
 title: ''
 labels: ''
 assignees: ''

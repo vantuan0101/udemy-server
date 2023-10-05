@@ -1,0 +1,25 @@
+
+frontend:
+  root:
+    url: http://localhost:3000/  #TODO Replace with your frontend root URL / empty string
+
+server:
+  error:
+    include-stacktrace: never
+  port: 9000 # server port
+
+# spring:
+#   datasource:
+#     password: ${MYSQL_PASSWORD}
+#     url: jdbc:mysql://localhost:3306/wedemy?connectionTimeZone=UTC&useSSL=false
+#     username: root
+#   jpa:
+#     hibernate:
+#       ddl-auto: update #You may chnage to `NONE` in production
+#     properties:
+#       hibernate:
+#         order_inserts: true
+#         order_updates: true
+#         dialect: org.hibernate.dialect.MySQL8Dialect
+#         jdbc:
+#           batch-size: 20

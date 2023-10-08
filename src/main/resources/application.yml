@@ -8,18 +8,18 @@ server:
     include-stacktrace: never
   port: 9000 # server port
 
-# spring:
-#   datasource:
-#     password: ${MYSQL_PASSWORD}
-#     url: jdbc:mysql://localhost:3306/wedemy?connectionTimeZone=UTC&useSSL=false
-#     username: root
-#   jpa:
-#     hibernate:
-#       ddl-auto: update #You may chnage to `NONE` in production
-#     properties:
-#       hibernate:
-#         order_inserts: true
-#         order_updates: true
-#         dialect: org.hibernate.dialect.MySQL8Dialect
-#         jdbc:
-#           batch-size: 20
+spring:
+  datasource:
+    password: ${MYSQL_PASSWORD}
+    url: jdbc:mysql://localhost:3306/udemy_test?connectionTimeZone=UTC&useSSL=false
+    username: root
+  jpa:
+    hibernate:
+      ddl-auto: update #You may chnage to `NONE` in production
+    properties:
+      hibernate:
+        order_inserts: true
+        order_updates: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        jdbc:
+          batch-size: 20

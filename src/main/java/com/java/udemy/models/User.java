@@ -1,6 +1,9 @@
 package com.java.udemy.models;
 
 import java.time.Instant;
+import java.util.Objects;
+
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -13,13 +16,16 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
+@RequiredArgsConstructor
 public class User {
+  private static final long serialVersionUID = -1352733651057286866L;
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -63,7 +69,47 @@ public class User {
   @JsonProperty(access = Access.READ_ONLY)
   private Instant createdAt;
 
+  @JsonIgnore
   public String getPassword() {
     return password;
+  }
+
+  @JsonIgnore
+  public boolean isAccountNonExpired() {
+    return true;
+  }
+
+  @JsonIgnore
+  public boolean isAccountNonLocked() {
+    return true;
+  }
+
+  @JsonIgnore
+  public boolean isCredentialsNonExpired() {
+    return true;
+  }
+
+  @JsonIgnore
+  public boolean isEnabled() {
+    return true;
+  }
+
+  public String getUserRole() {
+    return String.valueOf(userRole);
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o))
+      return false;
+    User user = (User) o;
+    return id != null && Objects.equals(id, user.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 }

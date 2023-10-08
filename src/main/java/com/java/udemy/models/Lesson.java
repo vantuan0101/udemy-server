@@ -1,5 +1,6 @@
 package com.java.udemy.models;
 
+import java.util.Objects;
 import java.util.UUID;
 
 import jakarta.persistence.*;
@@ -7,17 +8,23 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import java.time.Duration;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "lessons")
 @Getter
 @Setter
+@RequiredArgsConstructor
+@Table(name = "lessons", uniqueConstraints = @UniqueConstraint(columnNames = { "course_id", "position" }))
 public class Lesson {
 
   @Id
@@ -42,8 +49,31 @@ public class Lesson {
   @Column(nullable = false)
   private Integer position;
 
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
   @JoinColumn(name = "course_id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @JsonBackReference
   private Course course;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o))
+      return false;
+    Lesson lesson = (Lesson) o;
+    return id != null && Objects.equals(id, lesson.id);
+  }
+
+  /* convert to mm:ss */
+  public String getLengthSeconds() {
+    return String.format("%02d:%02d", Duration.ofSeconds(this.lengthSeconds).toMinutesPart(),
+        Duration.ofSeconds(this.lengthSeconds).toSecondsPart());
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
+  }
 
 }

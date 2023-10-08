@@ -1,16 +1,24 @@
 package com.java.udemy.models;
 
 import java.time.Instant;
+import java.util.Objects;
 
+import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Entity
-@Table(name = "wishlist")
+@Table(name = "wishlist", uniqueConstraints = @UniqueConstraint(columnNames = { "user_id", "course_id" }))
+@Getter
+@RequiredArgsConstructor
 public class Wishlist {
 
   @Id
@@ -18,11 +26,14 @@ public class Wishlist {
   private Integer id;
 
   @JoinColumn(name = "user_id")
-
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @JsonBackReference
   private User user;
 
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
   @JoinColumn(name = "course_id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @JsonBackReference
   private Course course;
 
@@ -30,4 +41,19 @@ public class Wishlist {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   @Column(nullable = false)
   private Instant createdAt;
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o)
+      return true;
+    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o))
+      return false;
+    Wishlist wishlist = (Wishlist) o;
+    return id != null && Objects.equals(id, wishlist.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
+  }
 }

@@ -1,12 +1,13 @@
-
 frontend:
   root:
-    url: http://localhost:3000/  #TODO Replace with your frontend root URL / empty string
+    url: http://localhost:3000/ #TODO Replace with your frontend root URL / empty string
 
 server:
   error:
     include-stacktrace: never
   port: 9000 # server port
+  jwtSecret: ${JWT_SECRET}
+  jwtExpirationMs: ${JWT_EXPIRATION} # minutes
 
 spring:
   datasource:

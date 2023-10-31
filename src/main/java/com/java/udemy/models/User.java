@@ -5,7 +5,9 @@ import java.util.Objects;
 
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
-
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
@@ -18,98 +20,120 @@ import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class User {
-  private static final long serialVersionUID = -1352733651057286866L;
+public class User implements UserDetails {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @JsonProperty(access = Access.READ_ONLY)
-  private Integer id;
+    private static final long serialVersionUID = -1352733651057286866L;
 
-  @Column(nullable = false, length = 100)
-  @Size(max = 100)
-  @Pattern(regexp = "^[ a-zA-Z0-9_.'\\-]+?", message = "Invalid characters in name")
-  @NotBlank
-  private String fullname;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonProperty(access = Access.READ_ONLY)
+    private Integer id;
 
-  @Column(nullable = false, unique = true)
-  @Email
-  @Pattern(regexp = "(^[0-9A-Za-z][\\w.\\-]+@[\\w]+\\.[\\w]\\S+\\w)$", message = "Invalid email!")
-  @NotBlank
-  private String email;
+    @Column(nullable = false, length = 100)
+    @Size(max = 100)
+    @Pattern(regexp = "^[ a-zA-Z0-9_.'\\-]+?", message = "Invalid characters in name")
+    @NotBlank
+    private String fullname;
 
-  @Column(length = 100)
-  @JsonProperty(access = Access.WRITE_ONLY)
-  private String password;
+    @Column(nullable = false, unique = true)
+    @Email
+    @Pattern(regexp = "(^[0-9A-Za-z][\\w.\\-]+@[\\w]+\\.[\\w]\\S+\\w)$", message = "Invalid email!")
+    @NotBlank
+    private String email;
 
-  @Transient
-  @JsonProperty(access = Access.WRITE_ONLY)
-  @NotBlank
-  @Size(min = 8)
-  private String confirmPass;
+    @Column(length = 100)
+    @JsonProperty(access = Access.WRITE_ONLY)
+    private String password;
 
-  @Enumerated(EnumType.STRING)
-  @Column(columnDefinition = "enum('LOCAL', 'GOOGLE') DEFAULT 'LOCAL'", nullable = false)
-  @JsonIgnore
-  private AuthProvider authProvider = AuthProvider.LOCAL;
+    @Transient
+    @JsonProperty(access = Access.WRITE_ONLY)
+    @NotBlank
+    @Size(min = 8)
+    private String confirmPass;
 
-  @Enumerated(EnumType.STRING)
-  @Column(columnDefinition = "enum('ROLE_STUDENT', 'ROLE_ADMIN') DEFAULT 'ROLE_STUDENT'", nullable = false)
-  @JsonIgnore
-  private UserRole userRole = UserRole.ROLE_STUDENT;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "enum('LOCAL', 'GOOGLE') DEFAULT 'LOCAL'", nullable = false)
+    @JsonIgnore
+    private AuthProvider authProvider = AuthProvider.LOCAL;
 
-  @CreationTimestamp
-  @Column(nullable = false)
-  @JsonProperty(access = Access.READ_ONLY)
-  private Instant createdAt;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "enum('ROLE_STUDENT', 'ROLE_ADMIN') DEFAULT 'ROLE_STUDENT'", nullable = false)
+    @JsonIgnore
+    private UserRole userRole = UserRole.ROLE_STUDENT;
 
-  @JsonIgnore
-  public String getPassword() {
-    return password;
-  }
+    @CreationTimestamp
+    @Column(nullable = false)
+    @JsonProperty(access = Access.READ_ONLY)
+    private Instant createdAt;
 
-  @JsonIgnore
-  public boolean isAccountNonExpired() {
-    return true;
-  }
+    @Override
+    @JsonIgnore
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority(this.getUserRole());
+        return Collections.singletonList(authority);
+    }
 
-  @JsonIgnore
-  public boolean isAccountNonLocked() {
-    return true;
-  }
+    @Override
+    @JsonIgnore
+    public String getPassword() {
+        return password;
+    }
 
-  @JsonIgnore
-  public boolean isCredentialsNonExpired() {
-    return true;
-  }
+    @Override
+    @JsonIgnore
+    public String getUsername() {
+        return email;
+    }
 
-  @JsonIgnore
-  public boolean isEnabled() {
-    return true;
-  }
+    @Override
+    @JsonIgnore
+    public boolean isAccountNonExpired() {
+        return true;
+    }
 
-  public String getUserRole() {
-    return String.valueOf(userRole);
-  }
+    @Override
+    @JsonIgnore
+    public boolean isAccountNonLocked() {
+        return true;
+    }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o))
-      return false;
-    User user = (User) o;
-    return id != null && Objects.equals(id, user.id);
-  }
+    @Override
+    @JsonIgnore
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
-  @Override
-  public int hashCode() {
-    return getClass().hashCode();
-  }
+    @Override
+    @JsonIgnore
+    public boolean isEnabled() {
+        return true;
+    }
+
+    public String getUserRole() {
+        return String.valueOf(userRole);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        User user = (User) o;
+        return id != null && Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
 }

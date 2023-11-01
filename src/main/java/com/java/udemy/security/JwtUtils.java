@@ -13,15 +13,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-import com.java.udemy.models.User;
-
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtils {
@@ -39,24 +35,19 @@ public class JwtUtils {
     }
 
     public String generateJwtToken(Authentication authentication) {
-        try {
-            User user = (User) authentication.getPrincipal();
-            Date now = new Date();
-            Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
+        UserDetailsImplement userDetails = (UserDetailsImplement) authentication.getPrincipal();
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
 
-            String token = Jwts.builder()
-                    .claim("name", user.getFullname())
-                    .claim("email", user.getUsername())
-                    .setSubject((user.getUsername()))
-                    .setIssuedAt(now)
-                    .setExpiration(expiryDate)
-                    .signWith(key())
-                    .compact();
-            return token;
-        } catch (Exception e) {
-            System.out.println(e);
-            return "";
-        }
+        String token = Jwts.builder()
+                .claim("name", userDetails.getFullname())
+                .claim("email", userDetails.getEmail())
+                .setSubject((userDetails.getEmail()))
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
+                .signWith(key())
+                .compact();
+        return token;
     }
 
     public String getUserNameFromJwtToken(String token) {

@@ -6,7 +6,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.java.udemy.models.User;
 import com.java.udemy.repository.UserRepository;
+import com.java.udemy.security.UserDetailsImplement;
 
 @Service
 public class MyUserDetailsService implements UserDetailsService {
@@ -17,7 +19,8 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username)
+        User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Not found"));
+        return new UserDetailsImplement(user);
     }
 }

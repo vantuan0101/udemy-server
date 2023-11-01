@@ -1,5 +1,7 @@
 package com.java.udemy.controllers;
 
+import java.util.Optional;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,8 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.java.udemy.custom.GenericResponse;
 import com.java.udemy.dto.UserDTO;
 import com.java.udemy.repository.UserRepository;
 
@@ -26,13 +28,15 @@ public class ProfileController {
   }
 
   @GetMapping(path = "/me/{id}")
-  ResponseEntity<UserDTO> getUserById(@PathVariable Integer id) {
+  ResponseEntity<?> getUserById(@PathVariable Integer id) {
     try {
       UserDTO userDTO = userRepository.findUserDTObyId(id).orElseThrow();
-      return ResponseEntity.ok().body(userDTO);
-
+      return ResponseEntity.status(HttpStatus.OK).body(
+          userDTO);
     } catch (Exception ex) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body(
+              GenericResponse.fail(ex.getMessage()));
     }
   }
 }

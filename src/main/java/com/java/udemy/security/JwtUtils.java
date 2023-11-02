@@ -1,11 +1,7 @@
 package com.java.udemy.security;
 
 import java.security.Key;
-import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.Date;
-
-import javax.crypto.spec.SecretKeySpec;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +14,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtils {
@@ -29,9 +27,12 @@ public class JwtUtils {
     @Value("${server.jwtExpirationMs}")
     private long jwtExpirationMs = 3600000;
 
+    // private Key key() {
+    // return new SecretKeySpec(Base64.getDecoder().decode(jwtSecret),
+    // SignatureAlgorithm.HS256.getJcaName());
+    // }
     private Key key() {
-        return new SecretKeySpec(Base64.getDecoder().decode(jwtSecret), 
-        SignatureAlgorithm.HS256.getJcaName());
+        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
     public String generateJwtToken(Authentication authentication) {
@@ -45,7 +46,7 @@ public class JwtUtils {
                 .setSubject((userDetails.getEmail()))
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(key())
+                .signWith(key(), SignatureAlgorithm.HS256)
                 .compact();
         return token;
     }

@@ -20,6 +20,9 @@ import com.java.udemy.models.User;
 import com.java.udemy.repository.UserRepository;
 import com.java.udemy.security.JwtUtils;
 import com.java.udemy.security.UserDetailsImplement;
+import com.java.udemy.service.MyUserDetailsService;
+
+import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,7 +71,7 @@ public class AuthController {
     }
 
     @PostMapping(path = "/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest loginRequest, HttpSession httpSession) {
         try {
             String password = loginRequest.getPassword();
             String email = loginRequest.getEmail();
@@ -80,6 +83,8 @@ public class AuthController {
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(item -> item.getAuthority())
                     .collect(Collectors.toList());
+
+            httpSession.setAttribute(MyUserDetailsService.USERID, userDetails.getId());
             return ResponseEntity.status(HttpStatus.OK)
                     .body(new LoginResponse(
                             "Login Successfully!",

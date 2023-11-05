@@ -17,6 +17,7 @@ import com.java.udemy.repository.CourseRepository;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -67,5 +68,41 @@ public class CourseController {
         }
         return courseRepository.getCoursesByTitleContaining(title, PageRequest.of(page, 10));
     }
+    @PostMapping(path="/insert")
+    ResponseEntity<Course> insertCourse(@RequestBody Course newCourse){
+       
+        return ResponseEntity.status(HttpStatus.OK).body(courseRepository.save(newCourse));
+    }
+
+    @PutMapping(path="/{id}")
+    ResponseEntity<Course> updateCourse(@RequestBody Course newCourse,@PathVariable Integer id){
+        Course updatedCourse=courseRepository.findById(id)
+            .map(course->{
+                course.setTitle(newCourse.getTitle());
+                course.setSubtitle(newCourse.getSubtitle());
+                course.setAuthor(newCourse.getAuthor());
+                course.setCategory(newCourse.getCategory());
+                course.setRating(newCourse.getRating());
+                course.setThumbUrl(newCourse.getThumbUrl());
+                return courseRepository.save(course);
+            }).orElseGet(()->{
+                newCourse.setId(id);
+                return courseRepository.save(newCourse);
+            });
+        return ResponseEntity.status(HttpStatus.OK).body(updatedCourse);
+    }
+    
+    @DeleteMapping(path="/{id}")
+    ResponseEntity<String> deleteCourse(@PathVariable Integer id) {
+        boolean exists = courseRepository.existsById(id);
+        if (exists) {
+            courseRepository.deleteById(id);
+            return ResponseEntity.ok().body("Course with ID " + id + " has been successfully deleted.");
+            
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
 

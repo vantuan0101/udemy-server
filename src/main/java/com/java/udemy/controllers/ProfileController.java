@@ -23,7 +23,7 @@ import com.java.udemy.custom.GenericResponse;
 import com.java.udemy.dto.UserDTO;
 import com.java.udemy.models.User;
 import com.java.udemy.repository.UserRepository;
-import com.java.udemy.service.MyUserDetailsService;
+import com.java.udemy.service.concretions.UserService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -40,17 +40,15 @@ public class ProfileController {
   }
 
   @GetMapping(path = "/me")
-  ResponseEntity<?> getUserById(@NotNull HttpSession session) {
+  ResponseEntity<UserDTO> getUserById(@NotNull HttpSession session) {
     try {
-      Integer userId = MyUserDetailsService.getSessionUserId(session);
+      Integer userId = UserService.getSessionUserId(session);
       System.out.println("userId" + userId);
       UserDTO userDTO = userRepository.findUserDTObyId(userId).orElseThrow();
       return ResponseEntity.status(HttpStatus.OK).body(
           userDTO);
     } catch (Exception ex) {
-      return ResponseEntity.status(HttpStatus.NOT_FOUND)
-          .body(
-              GenericResponse.fail(ex.getMessage()));
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
     }
   }
 
@@ -58,7 +56,7 @@ public class ProfileController {
   @Transactional
   public ResponseEntity<UserDTO> editMyProfile(@RequestBody UserDTO userDTO, @NotNull HttpSession session) {
     try {
-      Integer userId = MyUserDetailsService.getSessionUserId(session);
+      Integer userId = UserService.getSessionUserId(session);
       User u = userRepository.findById(userId).orElseThrow();
       u.setFullname(userDTO.getFullname());
       // You may modify other fields

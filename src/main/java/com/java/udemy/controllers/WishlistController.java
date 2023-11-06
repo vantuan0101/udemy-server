@@ -14,7 +14,7 @@ import com.java.udemy.custom.GenericResponse;
 import com.java.udemy.models.Course;
 import com.java.udemy.repository.CourseRepository;
 import com.java.udemy.repository.WishlistRepository;
-import com.java.udemy.service.MyUserDetailsService;
+import com.java.udemy.service.concretions.UserService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -36,7 +36,7 @@ public class WishlistController {
   @PostMapping(path = "/course/{courseId}")
   @ResponseStatus(HttpStatus.CREATED)
   public ResponseEntity<GenericResponse> addNewWishlist(@PathVariable Integer courseId, HttpSession session) {
-    Integer userId = MyUserDetailsService.getSessionUserId(session);
+    Integer userId = UserService.getSessionUserId(session);
     int count = wishlistRepository.saveByCourseIdAndUserId(courseId, userId);
     return ResponseEntity.ok(new GenericResponse(String.format("Added %d item to Wishlist", count)));
   }
@@ -44,7 +44,7 @@ public class WishlistController {
   @GetMapping(path = "/status/c/{courseId}")
   @ResponseStatus(HttpStatus.OK)
   public Map<String, Boolean> checkUserLikedCourse(@PathVariable @NotNull Integer courseId, HttpSession session) {
-    Integer userId = MyUserDetailsService.getSessionUserId(session);
+    Integer userId = UserService.getSessionUserId(session);
     boolean inWishlist = wishlistRepository.checkIfExistWishlistNative(userId, courseId) > 0;
     return Collections.singletonMap("inWishlist", inWishlist);
   }
@@ -52,7 +52,7 @@ public class WishlistController {
   @GetMapping(path = "/mine")
   @ResponseStatus(HttpStatus.OK)
   public Page<Course> getMyWishlistPaged(@RequestParam(defaultValue = "0") Integer page, HttpSession session) {
-    Integer userId = MyUserDetailsService.getSessionUserId(session);
+    Integer userId = UserService.getSessionUserId(session);
     return courseRepository.getWishlistByUser(userId, PageRequest.of(Math.abs(page), 5));
   }
 
@@ -60,7 +60,7 @@ public class WishlistController {
   @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<GenericResponse> removeWishlistByCourseId(@PathVariable @NotNull Integer courseId,
       HttpSession session) {
-    Integer userId = MyUserDetailsService.getSessionUserId(session);
+    Integer userId = UserService.getSessionUserId(session);
     int deletedCount = wishlistRepository.deleteByUserIdAndCoursesIn(userId, Collections.singletonList(courseId));
     if (deletedCount != 1) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not remove from wishlist");

@@ -12,7 +12,7 @@ import com.java.udemy.dto.OrderItemDTO;
 import com.java.udemy.dto.SalesDTO;
 import com.java.udemy.repository.OrderItemRepository;
 import com.java.udemy.repository.SalesRepository;
-import com.java.udemy.service.MyUserDetailsService;
+import com.java.udemy.service.concretions.UserService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -31,7 +31,7 @@ public class SalesController {
   @GetMapping(path = "/mine")
   public Slice<SalesDTO> getAllMyOwnedItems(@NotNull HttpSession session,
       @RequestParam(defaultValue = "0") Integer page) {
-    Integer userId = MyUserDetailsService.getSessionUserId(session);
+    Integer userId = UserService.getSessionUserId(session);
     Pageable pageable = PageRequest.of(page, 10, Sort.Direction.DESC, "createdAt");
     return salesRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
   }

@@ -17,8 +17,8 @@ import com.java.udemy.dto.ReviewDTO;
 import com.java.udemy.dto.ReviewRequest;
 import com.java.udemy.models.Review;
 import com.java.udemy.repository.ReviewRepository;
-import com.java.udemy.service.MyUserDetailsService;
 import com.java.udemy.service.ReviewService;
+import com.java.udemy.service.concretions.UserService;
 
 import jakarta.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -39,7 +39,7 @@ public class ReviewController {
   public ResponseEntity<GenericResponse> addCourseReview(@Valid @RequestBody ReviewRequest review,
       HttpSession session) {
     try {
-      Integer userId = MyUserDetailsService.getSessionUserId(session);
+      Integer userId = UserService.getSessionUserId(session);
       reviewService.addCourseRating(review, userId);
       return ResponseEntity.ok().body(new GenericResponse("Thanks for your review!"));
     } catch (Exception e) {
@@ -62,7 +62,7 @@ public class ReviewController {
   @GetMapping(path = "/mine/c/{courseId}")
   @Secured(value = "ROLE_STUDENT")
   public ResponseEntity<Review> getMyReviewOnCourse(@PathVariable Integer courseId, HttpSession session) {
-    Integer userId = MyUserDetailsService.getSessionUserId(session);
+    Integer userId = UserService.getSessionUserId(session);
     var reviewOptional = reviewRepository.findByUserIdAndCourseId(userId, courseId);
     return ResponseEntity.of(reviewOptional);
   }

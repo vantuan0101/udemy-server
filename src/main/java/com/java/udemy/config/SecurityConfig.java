@@ -1,6 +1,8 @@
 package com.java.udemy.config;
 
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.boot.web.server.WebServerFactoryCustomizer;
+import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -10,7 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.java.udemy.security.AuthTokenFilter;
+import com.java.udemy.config.security.AuthTokenFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -39,5 +41,10 @@ public class SecurityConfig {
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.sessionManagement(s -> s.maximumSessions(2)).build();
+    }
+
+    @Bean
+    public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> webServerFactoryCustomizer() {
+        return factory -> factory.setContextPath("/api");
     }
 }

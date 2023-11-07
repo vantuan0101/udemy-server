@@ -8,8 +8,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.java.udemy.dto.CategoryDTO;
 import com.java.udemy.models.Course;
+import com.java.udemy.request.CategoryRequest;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Collection;
@@ -24,8 +24,8 @@ public interface CourseRepository extends CrudRepository<Course, Integer> {
 
     Slice<Course> getCoursesByTitleContaining(@Param("title") String title, Pageable pageable);
 
-    @Query(value = "SELECT new com.java.udemy.dto.CategoryDTO(MAX(c.id), c.category) FROM Course c GROUP BY c.category")
-    List<CategoryDTO> getAllDistinctCategories();
+    @Query(value = "SELECT new com.java.udemy.request.CategoryRequest(MAX(c.id), c.category) FROM Course c GROUP BY c.category")
+    List<CategoryRequest> getAllDistinctCategories();
 
     List<Course> findCoursesByIdIn(Collection<Integer> ids);
 

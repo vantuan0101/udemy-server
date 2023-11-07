@@ -6,14 +6,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import com.java.udemy.dto.OrderItemDTO;
 import com.java.udemy.models.OrderItem;
+import com.java.udemy.request.OrderItemRequest;
 
 @Repository
 public interface OrderItemRepository extends CrudRepository<OrderItem, Long> {
 
-  @Query("SELECT new com.java.udemy.dto.OrderItemDTO(o.id, c.title, c.price) from OrderItem o " +
+  @Query("SELECT new com.java.udemy.request.OrderItemRequest(o.id, c.title, c.price) from OrderItem o " +
       "INNER JOIN Course c on o.course.id = c.id where o.sale.transactionId = ?1")
-  Slice<OrderItemDTO> findByTransactionIdEquals(String transactionId, Pageable pageable);
+  Slice<OrderItemRequest> findByTransactionIdEquals(String transactionId, Pageable pageable);
 
 }

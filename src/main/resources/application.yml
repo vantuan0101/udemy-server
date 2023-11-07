@@ -2,12 +2,26 @@ frontend:
   root:
     url: http://localhost:3000/ #TODO Replace with your frontend root URL / empty string
 
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
 server:
   error:
     include-stacktrace: never
   port: 9000 # server port
   jwtSecret: ${JWT_SECRET}
   jwtExpirationMs: ${JWT_EXPIRATION} # minutes
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        max-age: 10800s #3hours
+        name: WD_SESSION
+    encoding:
+      charset: UTF-8
+      force: true
 
 spring:
   datasource:

@@ -1,0 +1,2 @@
+export interface Lecturer {
+}

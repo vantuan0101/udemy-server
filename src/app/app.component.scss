@@ -1,0 +1,58 @@
+body{
+    font-family: 'Oswald', sans-serif;
+}
+.li {
+    color: black !important;
+    font-size: 20px;
+    display: flex !important;
+    margin: 0 20px; 
+    align-items: center; 
+  }
+  
+.navbar {
+    height: 70px;
+    width: 100%;
+    display: flex; 
+    justify-content: center;
+    align-items: center; 
+    background-color: white !important;
+}
+.img{
+    max-width: 50%;
+    max-height: 100%;
+    align-items: flex-start;
+    justify-content: baseline;
+}
+.search{
+    width: 309px;
+    height: 55px;
+    flex-grow: 0;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: white;
+    box-shadow: none !important;
+    padding: 1px 16px;
+    gap: 10px;
+    padding: 1px 16px;
+    border-radius: 12px;
+    border: solid 1px #8ac9bb;
+
+}
+.search::placeholder{
+    background-color: white !important;
+    font-style: italic;
+    font-size: 12px;
+    font-weight: 12px;
+    color: azure;
+}
+input:focus{
+
+    outline: none;
+}
+.btn{
+    border-color: #8ac9bb;
+    color: white !important;
+}
+  

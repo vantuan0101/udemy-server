@@ -1,28 +1,23 @@
 package com.java.udemy.controllers;
 
-import java.util.List;
-import java.util.Optional;
-
 import javax.validation.constraints.NotNull;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.java.udemy.custom.GenericResponse;
-import com.java.udemy.dto.UserDTO;
 import com.java.udemy.models.User;
 import com.java.udemy.repository.UserRepository;
+import com.java.udemy.request.UserRequest;
+import com.java.udemy.response.EditMyProfileResponse;
+import com.java.udemy.response.GetUserByIdResponse;
 import com.java.udemy.service.concretions.UserService;
 
 import jakarta.servlet.http.HttpSession;
@@ -40,29 +35,31 @@ public class ProfileController {
   }
 
   @GetMapping(path = "/me")
-  ResponseEntity<UserDTO> getUserById(@NotNull HttpSession session) {
+  public GetUserByIdResponse getUserById(@NotNull HttpSession session) {
     try {
       Integer userId = UserService.getSessionUserId(session);
-      System.out.println("userId" + userId);
-      UserDTO userDTO = userRepository.findUserDTObyId(userId).orElseThrow();
-      return ResponseEntity.status(HttpStatus.OK).body(
-          userDTO);
+      UserRequest userDTO = userRepository.findUserDTObyId(userId).orElseThrow();
+      GetUserByIdResponse response = new GetUserByIdResponse();
+      response.setUserDTO(userDTO);
+      return response;
     } catch (Exception ex) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, ex.getMessage());
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
   }
 
   @PutMapping(path = "/me")
   @Transactional
-  public ResponseEntity<UserDTO> editMyProfile(@RequestBody UserDTO userDTO, @NotNull HttpSession session) {
+  public EditMyProfileResponse editMyProfile(@RequestBody UserRequest request, @NotNull HttpSession session) {
     try {
       Integer userId = UserService.getSessionUserId(session);
-      User u = userRepository.findById(userId).orElseThrow();
-      u.setFullname(userDTO.getFullname());
-      // You may modify other fields
-      u.setConfirmPass("WHATEVER!");
-      User freshUser = userRepository.save(u);
-      return ResponseEntity.ok().body(modelMapper.map(freshUser, UserDTO.class));
+      User user = userRepository.findById(userId).orElseThrow();
+      user.setFullname(request.getFullname());
+      user.setConfirmPass("WHATEVER!");
+      User freshUser = userRepository.save(user);
+      UserRequest userDTO = modelMapper.map(freshUser, UserRequest.class);
+      EditMyProfileResponse response = new EditMyProfileResponse();
+      response.setUserDTO(userDTO);
+      return response;
     } catch (Exception ex) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not edit your profile", ex);
     }

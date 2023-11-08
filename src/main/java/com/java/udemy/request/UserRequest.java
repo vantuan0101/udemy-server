@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class UserRequest {
+public class UserRequest extends BaseRequest {
   private Integer id;
   private String fullname;
   private String email;

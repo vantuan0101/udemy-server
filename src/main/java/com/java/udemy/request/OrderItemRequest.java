@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Setter
 @RequiredArgsConstructor
 @ToString
-public class OrderItemRequest {
+public class OrderItemRequest extends BaseRequest {
   private Long id;
   private String title;
   private BigDecimal price;

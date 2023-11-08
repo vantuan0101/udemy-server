@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Getter
 @EqualsAndHashCode
 @ToString
-public class CategoryRequest implements Serializable {
+public class CategoryRequest extends BaseRequest implements Serializable {
     private static final long serialVersionUID = -248986479752746539L;
     private Integer id;
     private String category;

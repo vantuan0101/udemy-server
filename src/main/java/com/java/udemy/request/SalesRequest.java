@@ -14,7 +14,7 @@ import java.time.Instant;
 @Getter
 @ToString
 @RequiredArgsConstructor
-public class SalesRequest {
+public class SalesRequest extends BaseRequest {
   private String transactionId;
   private Instant createdAt;
   private String paymentMethod;

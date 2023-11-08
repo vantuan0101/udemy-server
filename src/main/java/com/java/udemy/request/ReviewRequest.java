@@ -8,7 +8,7 @@ import javax.validation.constraints.*;
  * REVIEW body sent from frontend
  */
 @Data
-public class ReviewRequest {
+public class ReviewRequest extends BaseRequest {
 
   @NotNull
   @Min(value = 1, message = "rating cannot be below 1")

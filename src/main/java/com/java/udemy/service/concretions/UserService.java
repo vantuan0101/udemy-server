@@ -9,12 +9,13 @@ import org.springframework.stereotype.Service;
 import com.java.udemy.config.security.UserDetailsImplement;
 import com.java.udemy.models.User;
 import com.java.udemy.repository.UserRepository;
+import com.java.udemy.service.abstractions.IUserService;
 
 import jakarta.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
 
 @Service
-public class UserService implements UserDetailsService {
+public class UserService implements IUserService, UserDetailsService {
     public static final String USERID = "USER_ID";
 
     @Autowired
@@ -33,7 +34,8 @@ public class UserService implements UserDetailsService {
      * @param session session
      * @return userId
      */
-    public static Integer getSessionUserId(@NotNull HttpSession session) {
+    @Override
+    public Integer getSessionUserId(@NotNull HttpSession session) {
         return (Integer) session.getAttribute(USERID);
     }
 }

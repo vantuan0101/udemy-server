@@ -2,7 +2,6 @@ package com.java.udemy.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -11,20 +10,18 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.java.udemy.exception.BadRequestException;
 import com.java.udemy.models.Course;
-import com.java.udemy.repository.CartRepository;
-import com.java.udemy.repository.CourseRepository;
 import com.java.udemy.response.CheckUserCartItemResponse;
 import com.java.udemy.response.CountMyCartItemsResponse;
 import com.java.udemy.response.GenericResponse;
 import com.java.udemy.response.GetAllMyCartItemsResponse;
 import com.java.udemy.response.GetMyCartBillResponse;
-import com.java.udemy.service.concretions.UserService;
+import com.java.udemy.service.abstractions.ICartService;
+import com.java.udemy.service.abstractions.IUserService;
 
 import jakarta.servlet.http.HttpSession;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.Map;
 
 @RestController
@@ -33,18 +30,17 @@ import java.util.Map;
 public class CartController {
 
   @Autowired
-  private CartRepository cartRepository;
+  private ICartService cartService;
 
   @Autowired
-  private CourseRepository courseRepository;
+  private IUserService userService;
 
   @PostMapping(path = "/course/{courseId}")
   @ResponseStatus(HttpStatus.CREATED)
   public GenericResponse addSingleItem(HttpSession session, @PathVariable Integer courseId) {
     try {
-      Integer userId = UserService.getSessionUserId(session);
-      Course course = courseRepository.findById(courseId).orElseThrow();
-      int count = cartRepository.addToCartCustom(course.getId(), userId, course.getPrice());
+      Integer userId = userService.getSessionUserId(session);
+      int count = cartService.addToCartCustom(courseId, userId);
       GenericResponse response = new GenericResponse(String.format("Added %d item to Cart", count));
       return response;
     } catch (Exception e) {
@@ -56,9 +52,8 @@ public class CartController {
   @ResponseStatus(HttpStatus.OK)
   public CheckUserCartItemResponse checkUserCartItem(@PathVariable @NotNull Integer courseId, HttpSession session) {
     try {
-      Integer userId = UserService.getSessionUserId(session);
-      boolean inCart = cartRepository.checkIfCourseInCart(userId, courseId) > 0;
-      Map<String, Boolean> checkUserCartItem = Collections.singletonMap("inCart", inCart);
+      Integer userId = userService.getSessionUserId(session);
+      Map<String, Boolean> checkUserCartItem = cartService.checkIfCourseInCart(userId, courseId);
       CheckUserCartItemResponse response = new CheckUserCartItemResponse();
       response.setCheckUserCartItem(checkUserCartItem);
       return response;
@@ -72,8 +67,8 @@ public class CartController {
   public GetAllMyCartItemsResponse getAllMyCartItems(@RequestParam(defaultValue = "0") Integer page,
       HttpSession session) {
     try {
-      Integer userId = UserService.getSessionUserId(session);
-      Page<Course> getAllMyCartItems = courseRepository.getCartListByUser(userId, PageRequest.of(Math.abs(page), 5));
+      Integer userId = userService.getSessionUserId(session);
+      Page<Course> getAllMyCartItems = cartService.getCartListByUser(userId, page);
       GetAllMyCartItemsResponse response = new GetAllMyCartItemsResponse();
       response.setGetAllMyCartItems(getAllMyCartItems);
       return response;
@@ -86,9 +81,8 @@ public class CartController {
   @ResponseStatus(HttpStatus.OK)
   public GetMyCartBillResponse getMyCartBill(HttpSession session) {
     try {
-      Integer userId = UserService.getSessionUserId(session);
-      BigDecimal totalPrice = cartRepository.getTotalBillForUser(userId);
-      Map<String, BigDecimal> getMyCartBill = Collections.singletonMap("totalPrice", totalPrice);
+      Integer userId = userService.getSessionUserId(session);
+      Map<String, BigDecimal> getMyCartBill = cartService.getTotalBillForUser(userId);
       GetMyCartBillResponse response = new GetMyCartBillResponse();
       response.setGetMyCartBill(getMyCartBill);
       return response;
@@ -101,9 +95,8 @@ public class CartController {
   @ResponseStatus(HttpStatus.OK)
   public CountMyCartItemsResponse countMyCartItems(HttpSession session) {
     try {
-      Integer userId = UserService.getSessionUserId(session);
-      long cartCount = cartRepository.countCartByUserIdEquals(userId);
-      Map<String, Long> countMyCartItems = Collections.singletonMap("cartCount", cartCount);
+      Integer userId = userService.getSessionUserId(session);
+      Map<String, Long> countMyCartItems = cartService.countCartByUserIdEquals(userId);
       CountMyCartItemsResponse response = new CountMyCartItemsResponse();
       response.setCountMyCartItems(countMyCartItems);
       return response;
@@ -117,11 +110,8 @@ public class CartController {
   public GenericResponse removeCartByCourseId(@PathVariable @NotNull Integer courseId,
       HttpSession session) {
     try {
-      Integer userId = UserService.getSessionUserId(session);
-      int deletedCount = cartRepository.deleteByUserIdAndCoursesIn(userId, Collections.singleton(courseId));
-      if (deletedCount != 1) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not remove from cart");
-      }
+      Integer userId = userService.getSessionUserId(session);
+      int deletedCount = cartService.deleteByUserIdAndCoursesIn(userId, courseId);
       GenericResponse response = new GenericResponse("Removed from Cart, course " + courseId);
       return response;
     } catch (Exception ex) {

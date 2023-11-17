@@ -1,7 +1,6 @@
 package com.java.udemy.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,9 +9,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.java.udemy.exception.BadRequestException;
 import com.java.udemy.models.Lesson;
-import com.java.udemy.repository.LessonRepository;
 import com.java.udemy.response.GetAllMyLessonsInEnrollmentResponse;
 import com.java.udemy.response.GetLessonsByCourseIdResponse;
+import com.java.udemy.service.abstractions.ILessonService;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -23,14 +22,14 @@ import java.util.Map;
 public class LessonController {
 
     @Autowired
-    private LessonRepository lessonRepository;
+    private ILessonService lessonService;
 
     @GetMapping(path = "/course/{id}")
     @ResponseStatus(HttpStatus.OK)
     public GetLessonsByCourseIdResponse getLessonsByCourseId(@PathVariable @NotNull Integer id,
             @RequestParam(defaultValue = "0") Integer page) {
         try {
-            Slice<Lesson> lessons = lessonRepository.getLessonsByCourseId(id, PageRequest.of(page, 10));
+            Slice<Lesson> lessons = lessonService.getLessonsByCourseId(id, page);
             GetLessonsByCourseIdResponse response = new GetLessonsByCourseIdResponse();
             response.setGetLessonsByCourseId(lessons);
             return response;
@@ -46,7 +45,7 @@ public class LessonController {
     public GetAllMyLessonsInEnrollmentResponse getAllMyLessonsInEnrollment(@PathVariable Integer courseId,
             @PathVariable Long enrollId) {
         try {
-            List<Map<String, Object>> lessons = lessonRepository.getWatchStatusListByEnrollment(enrollId, courseId);
+            List<Map<String, Object>> lessons = lessonService.getWatchStatusListByEnrollment(courseId, enrollId);
             GetAllMyLessonsInEnrollmentResponse response = new GetAllMyLessonsInEnrollmentResponse();
             response.setGetAllMyLessonsInEnrollment(lessons);
             return response;

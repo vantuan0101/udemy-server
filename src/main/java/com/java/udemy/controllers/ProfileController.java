@@ -18,7 +18,7 @@ import com.java.udemy.repository.UserRepository;
 import com.java.udemy.request.UserRequest;
 import com.java.udemy.response.EditMyProfileResponse;
 import com.java.udemy.response.GetUserByIdResponse;
-import com.java.udemy.service.concretions.UserService;
+import com.java.udemy.service.abstractions.IUserService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -27,17 +27,19 @@ import jakarta.servlet.http.HttpSession;
 public class ProfileController {
   private final UserRepository userRepository;
   private final ModelMapper modelMapper;
+  private IUserService userService;
 
   @Autowired
-  public ProfileController(UserRepository userRepository) {
+  public ProfileController(UserRepository userRepository, IUserService userService) {
     this.userRepository = userRepository;
+    this.userService = userService;
     this.modelMapper = new ModelMapper();
   }
 
   @GetMapping(path = "/me")
   public GetUserByIdResponse getUserById(@NotNull HttpSession session) {
     try {
-      Integer userId = UserService.getSessionUserId(session);
+      Integer userId = userService.getSessionUserId(session);
       UserRequest userDTO = userRepository.findUserDTObyId(userId).orElseThrow();
       GetUserByIdResponse response = new GetUserByIdResponse();
       response.setUserDTO(userDTO);
@@ -51,7 +53,7 @@ public class ProfileController {
   @Transactional
   public EditMyProfileResponse editMyProfile(@RequestBody UserRequest request, @NotNull HttpSession session) {
     try {
-      Integer userId = UserService.getSessionUserId(session);
+      Integer userId = userService.getSessionUserId(session);
       User user = userRepository.findById(userId).orElseThrow();
       user.setFullname(request.getFullname());
       user.setConfirmPass("WHATEVER!");

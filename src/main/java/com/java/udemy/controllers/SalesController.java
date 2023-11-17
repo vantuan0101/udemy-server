@@ -1,21 +1,17 @@
 package com.java.udemy.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import com.java.udemy.exception.BadRequestException;
-import com.java.udemy.repository.OrderItemRepository;
-import com.java.udemy.repository.SalesRepository;
 import com.java.udemy.request.OrderItemRequest;
 import com.java.udemy.request.SalesRequest;
 import com.java.udemy.response.GetAllMyOwnedItemsResponse;
 import com.java.udemy.response.GetItemsByTransactionIdResponse;
-import com.java.udemy.service.concretions.UserService;
+import com.java.udemy.service.abstractions.ISalesService;
+import com.java.udemy.service.abstractions.IUserService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -26,18 +22,17 @@ import javax.validation.constraints.NotNull;
 public class SalesController {
 
   @Autowired
-  private SalesRepository salesRepository;
+  private ISalesService salesService;
 
   @Autowired
-  private OrderItemRepository orderItemRepository;
+  private IUserService userService;
 
   @GetMapping(path = "/mine")
   public GetAllMyOwnedItemsResponse getAllMyOwnedItems(@NotNull HttpSession session,
       @RequestParam(defaultValue = "0") Integer page) {
     try {
-      Integer userId = UserService.getSessionUserId(session);
-      Pageable pageable = PageRequest.of(page, 10, Sort.Direction.DESC, "createdAt");
-      Slice<SalesRequest> allMyOwnedItems = salesRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+      Integer userId = userService.getSessionUserId(session);
+      Slice<SalesRequest> allMyOwnedItems = salesService.findByUserIdOrderByCreatedAtDesc(userId, page);
       GetAllMyOwnedItemsResponse response = new GetAllMyOwnedItemsResponse();
       response.setGetAllMyOwnedItems(allMyOwnedItems);
       return response;
@@ -50,8 +45,7 @@ public class SalesController {
   public GetItemsByTransactionIdResponse getItemsByTransactionId(@PathVariable String transactionId,
       @RequestParam(defaultValue = "0") Integer page) {
     try {
-      Slice<OrderItemRequest> itemsByTransactionId = orderItemRepository.findByTransactionIdEquals(transactionId,
-          PageRequest.of(page, 10));
+      Slice<OrderItemRequest> itemsByTransactionId = salesService.findByTransactionIdEquals(transactionId, page);
       GetItemsByTransactionIdResponse response = new GetItemsByTransactionIdResponse();
       response.setGetItemsByTransactionId(itemsByTransactionId);
       return response;

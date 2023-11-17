@@ -1,21 +1,19 @@
 package com.java.udemy.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.java.udemy.exception.BadRequestException;
 import com.java.udemy.models.Course;
-import com.java.udemy.repository.CourseRepository;
 import com.java.udemy.request.CategoryRequest;
 import com.java.udemy.response.GetCoursesByCategoryResponse;
 import com.java.udemy.response.SearchForCourseByTitleResponse;
+import com.java.udemy.service.abstractions.ICourseService;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -28,12 +26,12 @@ import java.util.concurrent.TimeUnit;
 public class CourseController {
 
     @Autowired
-    private CourseRepository courseRepository;
+    private ICourseService courseService;
 
     @GetMapping(path = "/id/{id}")
     public Optional<Course> getCourseById(@PathVariable @NotNull Integer id) {
         try {
-            return courseRepository.findById(id);
+            return courseService.findCourseById(id);
         } catch (Exception ex) {
             throw new BadRequestException(ex.getMessage());
         }
@@ -43,10 +41,7 @@ public class CourseController {
     @ResponseStatus(value = HttpStatus.OK)
     public GetCoursesByCategoryResponse getCoursesByCategory(@PathVariable @NotBlank String category) {
         try {
-            List<Course> courseList = courseRepository.getCoursesByCategoryEquals(category);
-            if (courseList.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No results for given category");
-            }
+            List<Course> courseList = courseService.getCoursesByCategoryEquals(category);
             GetCoursesByCategoryResponse response = new GetCoursesByCategoryResponse();
             response.setGetCoursesByCategory(courseList);
             return response;
@@ -59,7 +54,7 @@ public class CourseController {
     @ResponseStatus(value = HttpStatus.OK)
     public ResponseEntity<List<Course>> getAllTopCourses() {
         try {
-            List<Course> courseList = courseRepository.getTop6CoursesByIsFeatured(true);
+            List<Course> courseList = courseService.getTop6CoursesByIsFeatured(true);
             CacheControl cc = CacheControl.maxAge(60, TimeUnit.MINUTES).cachePublic();
             return ResponseEntity.ok().cacheControl(cc).body(courseList);
         } catch (Exception ex) {
@@ -71,7 +66,7 @@ public class CourseController {
     @ResponseStatus(value = HttpStatus.OK)
     public ResponseEntity<List<CategoryRequest>> getCategoryListDistinct() {
         try {
-            List<CategoryRequest> categories = courseRepository.getAllDistinctCategories();
+            List<CategoryRequest> categories = courseService.getAllDistinctCategories();
             CacheControl cc = CacheControl.maxAge(60, TimeUnit.MINUTES).cachePublic();
             return ResponseEntity.ok().cacheControl(cc).body(categories);
         } catch (Exception ex) {
@@ -85,11 +80,7 @@ public class CourseController {
             @RequestParam(defaultValue = "") @NotBlank String title,
             @RequestParam(defaultValue = "0") Integer page) {
         try {
-            if (title.length() < 3) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Search query too short");
-            }
-            Slice<Course> searchForCourseByTitles = courseRepository.getCoursesByTitleContaining(title,
-                    PageRequest.of(page, 10));
+            Slice<Course> searchForCourseByTitles = courseService.getCoursesByTitleContaining(title, page);
             SearchForCourseByTitleResponse response = new SearchForCourseByTitleResponse();
             response.setSearchForCourseByTitle(searchForCourseByTitles);
             return response;

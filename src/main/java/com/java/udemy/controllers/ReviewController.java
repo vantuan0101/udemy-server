@@ -1,10 +1,7 @@
 package com.java.udemy.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.annotation.Secured;
@@ -13,36 +10,33 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.java.udemy.exception.BadRequestException;
 import com.java.udemy.models.Review;
-import com.java.udemy.repository.ReviewRepository;
 import com.java.udemy.request.ReviewRequest;
 import com.java.udemy.response.GenericResponse;
 import com.java.udemy.response.GetCourseReviewsResponse;
 import com.java.udemy.response.GetMyReviewOnCourseResponse;
-import com.java.udemy.service.concretions.ReviewService;
-import com.java.udemy.service.concretions.UserService;
+import com.java.udemy.service.abstractions.IReviewService;
+import com.java.udemy.service.abstractions.IUserService;
 
 import jakarta.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping(path = "/reviews", produces = MediaType.APPLICATION_JSON_VALUE)
 public class ReviewController {
+  @Autowired
+  private IReviewService reviewService;
 
   @Autowired
-  private ReviewRepository reviewRepository;
-
-  @Autowired
-  private ReviewService reviewService;
+  private IUserService userService;
 
   @PostMapping(path = "/")
   @Secured(value = "ROLE_STUDENT")
   public GenericResponse addCourseReview(@Valid @RequestBody ReviewRequest review,
       HttpSession session) {
     try {
-      Integer userId = UserService.getSessionUserId(session);
+      Integer userId = userService.getSessionUserId(session);
       reviewService.addCourseRating(review, userId);
       GenericResponse response = new GenericResponse("Thanks for your review!");
       return response;
@@ -68,8 +62,8 @@ public class ReviewController {
   @Secured(value = "ROLE_STUDENT")
   public GetMyReviewOnCourseResponse getMyReviewOnCourse(@PathVariable Integer courseId, HttpSession session) {
     try {
-      Integer userId = UserService.getSessionUserId(session);
-      Optional<Review> reviewOptional = reviewRepository.findByUserIdAndCourseId(userId, courseId);
+      Integer userId = userService.getSessionUserId(session);
+      Optional<Review> reviewOptional = reviewService.findByUserIdAndCourseId(userId, courseId);
       GetMyReviewOnCourseResponse response = new GetMyReviewOnCourseResponse();
       response.setReview(reviewOptional);
       return response;
@@ -83,11 +77,7 @@ public class ReviewController {
       @RequestParam(defaultValue = "createdAt") String sortBy,
       @PathVariable Integer courseId) {
     try {
-      if (Stream.of("createdAt", "rating").noneMatch(sortBy::equals)) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid 'sort' param");
-      }
-      Pageable pageable = PageRequest.of(page, 10, Sort.Direction.DESC, sortBy);
-      Slice<ReviewRequest> reviews = reviewRepository.findByCourseId(courseId, pageable);
+      Slice<ReviewRequest> reviews = reviewService.findByCourseId(page, sortBy, courseId);
       GetCourseReviewsResponse response = new GetCourseReviewsResponse();
       response.setGetCourseReviews(reviews);
       return response;

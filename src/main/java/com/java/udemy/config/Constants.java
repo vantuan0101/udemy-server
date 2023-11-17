@@ -5,22 +5,23 @@ public final class Constants {
   private Constants() {
   }
 
-  public static final String MAIN_CURRENCY = "TRY";
+  public static final String MESSAGE_INVALID_TOKEN = "Invalid JWT token: {}";
+  public static final String MESSAGE_TOKEN_EXPIRED = "JWT token is expired: {}";
+  public static final String MESSAGE_TOKEN_UNSUPPORTED = "JWT token is unsupported: {}";
+  public static final String MESSAGE_TOKEN_CLAIM_EMPTY = "JWT claims string is empty: {}";
 
   public static final String MESSAGE_REGISTER_WELCOME = "Registered! Welcome.";
   public static final String MESSAGE_LOGIN_SUCCESS = "Login Successfully!.";
   public static final String MESSAGE_INVALID_USERNAME = "Invalid username.";
   public static final String MESSAGE_INVALID_PASSWORD = "Invalid password.";
   public static final String MESSAGE_INVALID_MATCH_PASSWORD = "Passwords don't match.";
-  public static final String MESSAGE_INVALID_CURRENCY = "Invalid currency.";
-  public static final String MESSAGE_INVALID_AMOUNT = "Invalid amount.";
-  public static final String MESSAGE_INVALID_TCNO = "Invalid TC No.";
-  public static final String MESSAGE_EXCEEDEDMAXVALUE = "Exceeded Maximum Value Per Transaction.";
-  public static final String MESSAGE_EXCEEDEDMAXVALUEFORDAY = "Exceeded Maximum Transaction Value For the Day.";
-  public static final String MESSAGE_SAMEUSERTRANSACTION = "You can't send money to yourself.";
-  public static final String MESSAGE_SAMEUSERNAMEEXIST = "User with the same name exists.";
-  public static final String MESSAGE_SAMETCNOEXIST = "User with the same tc no exists.";
-  public static final String MESSAGE_EXCHANGESWITHMAINCURRENCY = "You can't make exchange transactions with "
-      + MAIN_CURRENCY;
+
+  public static final String MESSAGE_ALL_SAVE = "All saved!";
+
+  public static final String MESSAGE_THANK_YOU_REVIEW = "Thanks for your review!";
+  public static final String MESSAGE_CANNOT_ADD_REVIEW = "Could not add review : ";
+  public static final String MESSAGE_CANNOT_EDIT_REVIEW = "Could not edit review : ";
+
+  public static final String MESSAGE_CAN_NOT_SAVE_OBJECTIVE = "Could not save new objectives";
 
 }

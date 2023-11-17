@@ -7,6 +7,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.java.udemy.config.Constants;
 import com.java.udemy.exception.BadRequestException;
 import com.java.udemy.models.CourseObjective;
 import com.java.udemy.request.CreateObjectivesRequest;
@@ -30,10 +31,10 @@ public class ObjectivesController {
     try {
       List<CourseObjective> coList = objectivesService.createObjectives(request);
       CreateObjectivesResponse response = new CreateObjectivesResponse();
-      response.setMessage("All saved!");
+      response.setMessage(Constants.MESSAGE_ALL_SAVE);
       return response;
     } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not save new objectives", e);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constants.MESSAGE_CAN_NOT_SAVE_OBJECTIVE, e);
     }
   }
 

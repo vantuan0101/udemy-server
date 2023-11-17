@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import com.java.udemy.config.Constants;
+
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -27,10 +29,6 @@ public class JwtUtils {
     @Value("${server.jwtExpirationMs}")
     private long jwtExpirationMs = 3600000;
 
-    // private Key key() {
-    // return new SecretKeySpec(Base64.getDecoder().decode(jwtSecret),
-    // SignatureAlgorithm.HS256.getJcaName());
-    // }
     private Key key() {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
@@ -61,13 +59,13 @@ public class JwtUtils {
             Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
             return true;
         } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT token: {}", e.getMessage());
+            logger.error(Constants.MESSAGE_INVALID_TOKEN, e.getMessage());
         } catch (ExpiredJwtException e) {
-            logger.error("JWT token is expired: {}", e.getMessage());
+            logger.error(Constants.MESSAGE_TOKEN_EXPIRED, e.getMessage());
         } catch (UnsupportedJwtException e) {
-            logger.error("JWT token is unsupported: {}", e.getMessage());
+            logger.error(Constants.MESSAGE_TOKEN_UNSUPPORTED, e.getMessage());
         } catch (IllegalArgumentException e) {
-            logger.error("JWT claims string is empty: {}", e.getMessage());
+            logger.error(Constants.MESSAGE_TOKEN_CLAIM_EMPTY, e.getMessage());
         }
 
         return false;

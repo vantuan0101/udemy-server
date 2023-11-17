@@ -8,6 +8,7 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.java.udemy.config.Constants;
 import com.java.udemy.exception.BadRequestException;
 import com.java.udemy.models.Review;
 import com.java.udemy.request.ReviewRequest;
@@ -38,10 +39,10 @@ public class ReviewController {
     try {
       Integer userId = userService.getSessionUserId(session);
       reviewService.addCourseRating(review, userId);
-      GenericResponse response = new GenericResponse("Thanks for your review!");
+      GenericResponse response = new GenericResponse(Constants.MESSAGE_THANK_YOU_REVIEW);
       return response;
     } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not add review", e);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constants.MESSAGE_CANNOT_ADD_REVIEW, e);
     }
   }
 
@@ -51,10 +52,10 @@ public class ReviewController {
       @Valid @RequestBody ReviewRequest review) {
     try {
       reviewService.updateCourseRating(id, review);
-      GenericResponse response = new GenericResponse("Thanks for your review!");
+      GenericResponse response = new GenericResponse(Constants.MESSAGE_THANK_YOU_REVIEW);
       return response;
     } catch (Exception e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not edit review", e);
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, Constants.MESSAGE_CANNOT_EDIT_REVIEW, e);
     }
   }
 

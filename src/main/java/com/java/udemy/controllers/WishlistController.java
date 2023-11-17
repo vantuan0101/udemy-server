@@ -18,7 +18,6 @@ import com.java.udemy.service.abstractions.IWishlistService;
 import jakarta.servlet.http.HttpSession;
 
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
 import java.util.Map;
 
 @RestController

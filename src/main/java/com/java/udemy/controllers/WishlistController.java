@@ -2,22 +2,18 @@ package com.java.udemy.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.java.udemy.exception.BadRequestException;
 import com.java.udemy.models.Course;
-import com.java.udemy.repository.CourseRepository;
-import com.java.udemy.repository.WishlistRepository;
 import com.java.udemy.response.CheckUserLikedCourseResponse;
 import com.java.udemy.response.GenericResponse;
 import com.java.udemy.response.GetMyWishlistPagedResponse;
-import com.java.udemy.service.concretions.UserService;
+import com.java.udemy.service.abstractions.IUserService;
+import com.java.udemy.service.abstractions.IWishlistService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -31,17 +27,17 @@ import java.util.Map;
 public class WishlistController {
 
   @Autowired
-  private WishlistRepository wishlistRepository;
+  private IWishlistService wishlistService;
 
   @Autowired
-  private CourseRepository courseRepository;
+  private IUserService userService;
 
   @PostMapping(path = "/course/{courseId}")
   @ResponseStatus(HttpStatus.CREATED)
   public GenericResponse addNewWishlist(@PathVariable Integer courseId, HttpSession session) {
     try {
-      Integer userId = UserService.getSessionUserId(session);
-      int count = wishlistRepository.saveByCourseIdAndUserId(courseId, userId);
+      Integer userId = userService.getSessionUserId(session);
+      int count = wishlistService.createWishlist(courseId, userId);
       GenericResponse response = new GenericResponse(String.format("Added %d item to Wishlist", count));
       return response;
     } catch (Exception ex) {
@@ -54,9 +50,8 @@ public class WishlistController {
   public CheckUserLikedCourseResponse checkUserLikedCourse(@PathVariable @NotNull Integer courseId,
       HttpSession session) {
     try {
-      Integer userId = UserService.getSessionUserId(session);
-      boolean inWishlist = wishlistRepository.checkIfExistWishlistNative(userId, courseId) > 0;
-      Map<String, Boolean> userLikedCourse = Collections.singletonMap("inWishlist", inWishlist);
+      Integer userId = userService.getSessionUserId(session);
+      Map<String, Boolean> userLikedCourse = wishlistService.checkIfExistWishlistNative(userId, courseId);
       CheckUserLikedCourseResponse response = new CheckUserLikedCourseResponse();
       response.setCheckUserLikedCourse(userLikedCourse);
       return response;
@@ -70,8 +65,8 @@ public class WishlistController {
   public GetMyWishlistPagedResponse getMyWishlistPaged(@RequestParam(defaultValue = "0") Integer page,
       HttpSession session) {
     try {
-      Integer userId = UserService.getSessionUserId(session);
-      Page<Course> listCourse = courseRepository.getWishlistByUser(userId, PageRequest.of(Math.abs(page), 5));
+      Integer userId = userService.getSessionUserId(session);
+      Page<Course> listCourse = wishlistService.getWishlistByUser(userId, page);
       GetMyWishlistPagedResponse response = new GetMyWishlistPagedResponse();
       response.setGetMyWishlistPaged(listCourse);
       return response;
@@ -85,11 +80,8 @@ public class WishlistController {
   public GenericResponse removeWishlistByCourseId(@PathVariable @NotNull Integer courseId,
       HttpSession session) {
     try {
-      Integer userId = UserService.getSessionUserId(session);
-      int deletedCount = wishlistRepository.deleteByUserIdAndCoursesIn(userId, Collections.singletonList(courseId));
-      if (deletedCount != 1) {
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not remove from wishlist");
-      }
+      Integer userId = userService.getSessionUserId(session);
+      int deletedCount = wishlistService.deleteByUserIdAndCoursesIn(userId, courseId);
       GenericResponse response = new GenericResponse("Removed from Wishlist, course " + courseId);
       return response;
     } catch (Exception ex) {

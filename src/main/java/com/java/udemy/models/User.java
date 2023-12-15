@@ -1,13 +1,8 @@
 package com.java.udemy.models;
 
 import java.time.Instant;
-import java.util.Objects;
 
-import org.hibernate.Hibernate;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
@@ -26,7 +21,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class User{
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonProperty(access = Access.READ_ONLY)
@@ -60,7 +55,7 @@ public class User{
     private AuthProvider authProvider = AuthProvider.LOCAL;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "enum('ROLE_STUDENT', 'ROLE_ADMIN') DEFAULT 'ROLE_STUDENT'", nullable = false)
+    @Column(columnDefinition = "enum('ROLE_STUDENT', 'ROLE_ADMIN' ,'ROLE_TEACHER') DEFAULT 'ROLE_STUDENT'", nullable = false)
     @JsonIgnore
     private UserRole userRole = UserRole.ROLE_STUDENT;
 
@@ -69,7 +64,7 @@ public class User{
     @JsonProperty(access = Access.READ_ONLY)
     private Instant createdAt;
 
-    public String getUserRole(){
+    public String getUserRole() {
         return String.valueOf(userRole);
     }
 }

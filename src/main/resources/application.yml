@@ -6,12 +6,12 @@ server:
   error:
     include-stacktrace: never
   port: 9000 # server port
-  jwtSecret: ${JWT_SECRET}
-  jwtExpirationMs: ${JWT_EXPIRATION} # minutes
+  jwtSecret: eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4c
+  jwtExpirationMs: 10 # minutes
 
 spring:
   datasource:
-    password: ${MYSQL_PASSWORD}
+    password: naytn12333
     url: jdbc:mysql://localhost:3306/udemy_dev?connectionTimeZone=UTC&useSSL=false
     username: root
   jpa:

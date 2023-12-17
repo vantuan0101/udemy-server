@@ -2,25 +2,26 @@ package com.java.udemy.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.java.udemy.custom.GenericResponse;
+import com.java.udemy.exception.BadRequestException;
 import com.java.udemy.models.Course;
-import com.java.udemy.repository.CartRepository;
-import com.java.udemy.repository.CourseRepository;
-import com.java.udemy.service.MyUserDetailsService;
+import com.java.udemy.response.CheckUserCartItemResponse;
+import com.java.udemy.response.CountMyCartItemsResponse;
+import com.java.udemy.response.GenericResponse;
+import com.java.udemy.response.GetAllMyCartItemsResponse;
+import com.java.udemy.response.GetMyCartBillResponse;
+import com.java.udemy.service.abstractions.ICartService;
+import com.java.udemy.service.abstractions.IUserService;
 
 import jakarta.servlet.http.HttpSession;
 
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.Map;
 
 @RestController
@@ -29,68 +30,93 @@ import java.util.Map;
 public class CartController {
 
   @Autowired
-  private CartRepository cartRepository;
+  private ICartService cartService;
 
   @Autowired
-  private CourseRepository courseRepository;
+  private IUserService userService;
 
   @PostMapping(path = "/course/{courseId}")
   @ResponseStatus(HttpStatus.CREATED)
-  public ResponseEntity<GenericResponse> addSingleItem(HttpSession session, @PathVariable Integer courseId) {
+  public GenericResponse addSingleItem(HttpSession session, @PathVariable Integer courseId) {
     try {
-      Integer userId = MyUserDetailsService.getSessionUserId(session);
-      Course course = courseRepository.findById(courseId).orElseThrow();
-      int count = cartRepository.addToCartCustom(course.getId(), userId, course.getPrice());
-      return ResponseEntity.ok(new GenericResponse(String.format("Added %d item to Cart", count)));
+      Integer userId = userService.getSessionUserId(session);
+      int count = cartService.addToCartCustom(courseId, userId);
+      GenericResponse response = new GenericResponse(String.format("Added %d item to Cart", count));
+      return response;
     } catch (Exception e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not add to cart", e);
     }
-
   }
 
   @GetMapping(path = "/status/c/{courseId}")
   @ResponseStatus(HttpStatus.OK)
-  public Map<String, Boolean> checkUserCartItem(@PathVariable @NotNull Integer courseId, HttpSession session) {
-    Integer userId = MyUserDetailsService.getSessionUserId(session);
-    boolean inCart = cartRepository.checkIfCourseInCart(userId, courseId) > 0;
-    Map<String, Boolean> response = Collections.singletonMap("inCart", inCart);
-    return response;
+  public CheckUserCartItemResponse checkUserCartItem(@PathVariable @NotNull Integer courseId, HttpSession session) {
+    try {
+      Integer userId = userService.getSessionUserId(session);
+      Map<String, Boolean> checkUserCartItem = cartService.checkIfCourseInCart(userId, courseId);
+      CheckUserCartItemResponse response = new CheckUserCartItemResponse();
+      response.setCheckUserCartItem(checkUserCartItem);
+      return response;
+    } catch (Exception ex) {
+      throw new BadRequestException(ex.getMessage());
+    }
   }
 
   @GetMapping(path = "/mine")
   @ResponseStatus(HttpStatus.OK)
-  public Page<Course> getAllMyCartItems(@RequestParam(defaultValue = "0") Integer page, HttpSession session) {
-    Integer userId = MyUserDetailsService.getSessionUserId(session);
-    return courseRepository.getCartListByUser(userId, PageRequest.of(Math.abs(page), 5));
+  public GetAllMyCartItemsResponse getAllMyCartItems(@RequestParam(defaultValue = "0") Integer page,
+      HttpSession session) {
+    try {
+      Integer userId = userService.getSessionUserId(session);
+      Page<Course> getAllMyCartItems = cartService.getCartListByUser(userId, page);
+      GetAllMyCartItemsResponse response = new GetAllMyCartItemsResponse();
+      response.setGetAllMyCartItems(getAllMyCartItems);
+      return response;
+    } catch (Exception ex) {
+      throw new BadRequestException(ex.getMessage());
+    }
   }
 
   @GetMapping(path = "/mine/bill")
   @ResponseStatus(HttpStatus.OK)
-  public Map<String, BigDecimal> getMyCartBill(HttpSession session) {
-    Integer userId = MyUserDetailsService.getSessionUserId(session);
-    BigDecimal totalPrice = cartRepository.getTotalBillForUser(userId);
-    return Collections.singletonMap("totalPrice", totalPrice);
+  public GetMyCartBillResponse getMyCartBill(HttpSession session) {
+    try {
+      Integer userId = userService.getSessionUserId(session);
+      Map<String, BigDecimal> getMyCartBill = cartService.getTotalBillForUser(userId);
+      GetMyCartBillResponse response = new GetMyCartBillResponse();
+      response.setGetMyCartBill(getMyCartBill);
+      return response;
+    } catch (Exception ex) {
+      throw new BadRequestException(ex.getMessage());
+    }
   }
 
   @GetMapping(path = "/mine/count")
   @ResponseStatus(HttpStatus.OK)
-  public Map<String, Long> countMyCartItems(HttpSession session) {
-    Integer userId = MyUserDetailsService.getSessionUserId(session);
-    long cartCount = cartRepository.countCartByUserIdEquals(userId);
-    Map<String, Long> response = Collections.singletonMap("cartCount", cartCount);
-    return response;
+  public CountMyCartItemsResponse countMyCartItems(HttpSession session) {
+    try {
+      Integer userId = userService.getSessionUserId(session);
+      Map<String, Long> countMyCartItems = cartService.countCartByUserIdEquals(userId);
+      CountMyCartItemsResponse response = new CountMyCartItemsResponse();
+      response.setCountMyCartItems(countMyCartItems);
+      return response;
+    } catch (Exception ex) {
+      throw new BadRequestException(ex.getMessage());
+    }
   }
 
   @DeleteMapping(path = "/course/{courseId}")
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<GenericResponse> removeCartByCourseId(@PathVariable @NotNull Integer courseId,
+  public GenericResponse removeCartByCourseId(@PathVariable @NotNull Integer courseId,
       HttpSession session) {
-    Integer userId = MyUserDetailsService.getSessionUserId(session);
-    int deletedCount = cartRepository.deleteByUserIdAndCoursesIn(userId, Collections.singleton(courseId));
-    if (deletedCount != 1) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Could not remove from cart");
+    try {
+      Integer userId = userService.getSessionUserId(session);
+      int deletedCount = cartService.deleteByUserIdAndCoursesIn(userId, courseId);
+      GenericResponse response = new GenericResponse("Removed from Cart, course " + courseId);
+      return response;
+    } catch (Exception ex) {
+      throw new BadRequestException(ex.getMessage());
     }
-    return ResponseEntity.ok(new GenericResponse("Removed from Cart, course " + courseId));
   }
 
 }

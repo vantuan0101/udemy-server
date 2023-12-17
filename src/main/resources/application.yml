@@ -2,16 +2,30 @@ frontend:
   root:
     url: http://localhost:3000/ #TODO Replace with your frontend root URL / empty string
 
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
 server:
   error:
     include-stacktrace: never
   port: 9000 # server port
-  jwtSecret: ${JWT_SECRET}
-  jwtExpirationMs: ${JWT_EXPIRATION} # minutes
+  jwtSecret: eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4c
+  jwtExpirationMs: 10 # minutes
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        max-age: 10800s #3hours
+        name: WD_SESSION
+    encoding:
+      charset: UTF-8
+      force: true
 
 spring:
   datasource:
-    password: ${MYSQL_PASSWORD}
+    password: naytn12333
     url: jdbc:mysql://localhost:3306/udemy_dev?connectionTimeZone=UTC&useSSL=false
     username: root
   jpa:

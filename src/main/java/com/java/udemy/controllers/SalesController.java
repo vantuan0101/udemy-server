@@ -1,18 +1,17 @@
 package com.java.udemy.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import com.java.udemy.dto.OrderItemDTO;
-import com.java.udemy.dto.SalesDTO;
-import com.java.udemy.repository.OrderItemRepository;
-import com.java.udemy.repository.SalesRepository;
-import com.java.udemy.service.MyUserDetailsService;
+import com.java.udemy.exception.BadRequestException;
+import com.java.udemy.request.OrderItemRequest;
+import com.java.udemy.request.SalesRequest;
+import com.java.udemy.response.GetAllMyOwnedItemsResponse;
+import com.java.udemy.response.GetItemsByTransactionIdResponse;
+import com.java.udemy.service.abstractions.ISalesService;
+import com.java.udemy.service.abstractions.IUserService;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -23,23 +22,36 @@ import javax.validation.constraints.NotNull;
 public class SalesController {
 
   @Autowired
-  private SalesRepository salesRepository;
+  private ISalesService salesService;
 
   @Autowired
-  private OrderItemRepository orderItemRepository;
+  private IUserService userService;
 
   @GetMapping(path = "/mine")
-  public Slice<SalesDTO> getAllMyOwnedItems(@NotNull HttpSession session,
+  public GetAllMyOwnedItemsResponse getAllMyOwnedItems(@NotNull HttpSession session,
       @RequestParam(defaultValue = "0") Integer page) {
-    Integer userId = MyUserDetailsService.getSessionUserId(session);
-    Pageable pageable = PageRequest.of(page, 10, Sort.Direction.DESC, "createdAt");
-    return salesRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+    try {
+      Integer userId = userService.getSessionUserId(session);
+      Slice<SalesRequest> allMyOwnedItems = salesService.findByUserIdOrderByCreatedAtDesc(userId, page);
+      GetAllMyOwnedItemsResponse response = new GetAllMyOwnedItemsResponse();
+      response.setGetAllMyOwnedItems(allMyOwnedItems);
+      return response;
+    } catch (Exception ex) {
+      throw new BadRequestException(ex.getMessage());
+    }
   }
 
   @GetMapping(path = "/mine/{transactionId}")
-  public Slice<OrderItemDTO> getItemsbyTransactionId(@PathVariable String transactionId,
+  public GetItemsByTransactionIdResponse getItemsByTransactionId(@PathVariable String transactionId,
       @RequestParam(defaultValue = "0") Integer page) {
-    return orderItemRepository.findByTransactionIdEquals(transactionId, PageRequest.of(page, 10));
+    try {
+      Slice<OrderItemRequest> itemsByTransactionId = salesService.findByTransactionIdEquals(transactionId, page);
+      GetItemsByTransactionIdResponse response = new GetItemsByTransactionIdResponse();
+      response.setGetItemsByTransactionId(itemsByTransactionId);
+      return response;
+    } catch (Exception ex) {
+      throw new BadRequestException(ex.getMessage());
+    }
   }
 
 }

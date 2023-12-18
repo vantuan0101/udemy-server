@@ -12,7 +12,7 @@ server:
     include-stacktrace: never
   port: 9000 # server port
   jwtSecret: eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4c
-  jwtExpirationMs: 10 # minutes
+  jwtExpirationMs: 100000000  # minutes
   servlet:
     session:
       cookie:

@@ -18,4 +18,9 @@ public interface ICourseService {
   List<CategoryRequest> getAllDistinctCategories();
 
   Slice<Course> getCoursesByTitleContaining(String title, Integer page);
+  Course insertCourse(Course course);
+
+  Course updateCourse(Integer id, Course updatedCourse);
+
+  void deleteCourse(Integer id);
 }

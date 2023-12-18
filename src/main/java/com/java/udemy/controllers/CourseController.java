@@ -88,40 +88,40 @@ public class CourseController {
             throw new BadRequestException(ex.getMessage());
         }
     }
-    @PostMapping(path="/insert")
-    ResponseEntity<Course> insertCourse(@RequestBody Course newCourse){
-       
-        return ResponseEntity.status(HttpStatus.OK).body(courseRepository.save(newCourse));
-    }
-
-    @PutMapping(path="/{id}")
-    ResponseEntity<Course> updateCourse(@RequestBody Course newCourse,@PathVariable Integer id){
-        Course updatedCourse=courseRepository.findById(id)
-            .map(course->{
-                course.setTitle(newCourse.getTitle());
-                course.setSubtitle(newCourse.getSubtitle());
-                course.setAuthor(newCourse.getAuthor());
-                course.setCategory(newCourse.getCategory());
-                course.setRating(newCourse.getRating());
-                course.setThumbUrl(newCourse.getThumbUrl());
-                return courseRepository.save(course);
-            }).orElseGet(()->{
-                newCourse.setId(id);
-                return courseRepository.save(newCourse);
-            });
-        return ResponseEntity.status(HttpStatus.OK).body(updatedCourse);
-    }
-    
-    @DeleteMapping(path="/{id}")
-    ResponseEntity<String> deleteCourse(@PathVariable Integer id) {
-        boolean exists = courseRepository.existsById(id);
-        if (exists) {
-            courseRepository.deleteById(id);
-            return ResponseEntity.ok().body("Course with ID " + id + " has been successfully deleted.");
-            
-        } else {
-            return ResponseEntity.notFound().build();
+    @PostMapping("/insert")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<Course> insertCourse(@RequestBody Course course) {
+        try {
+            Course insertedCourse = courseService.insertCourse(course);
+            return ResponseEntity.status(HttpStatus.CREATED).body(insertedCourse);
+        } catch (Exception ex) {
+            throw new BadRequestException(ex.getMessage());
         }
     }
 
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Course> updateCourse(
+            @PathVariable @NotNull Integer id,
+            @RequestBody Course updatedCourse) {
+        try {
+            Course updated = courseService.updateCourse(id, updatedCourse);
+            return ResponseEntity.ok(updated);
+        } catch (Exception ex) {
+            throw new BadRequestException(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> deleteCourse(@PathVariable @NotNull Integer id) {
+        try {
+            courseService.deleteCourse(id);
+            return ResponseEntity.noContent().build();
+        } catch (Exception ex) {
+            throw new BadRequestException(ex.getMessage());
+        }
+    }
 }
+
+

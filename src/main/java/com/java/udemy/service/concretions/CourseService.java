@@ -1,9 +1,11 @@
 package com.java.udemy.service.concretions;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
@@ -55,6 +57,43 @@ public class CourseService implements ICourseService {
         PageRequest.of(page, 10));
     return searchForCourseByTitles;
 
+  }
+  @Override
+  public Course insertCourse(Course course) {
+    // You may want to perform additional validation or business logic here before saving.
+    // Set a default rating if it is not provided
+    course.setRating(course.getRating() != null ? course.getRating() : BigDecimal.ZERO);
+    return courseRepository.save(course);
+  }
+
+  @Override
+  public Course updateCourse(Integer id, Course updatedCourse) {
+    Course existingCourse = courseRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found"));
+    
+    // Update the fields of the existing course with the values from the updated course.
+    existingCourse.setTitle(updatedCourse.getTitle());
+    existingCourse.setSubtitle(updatedCourse.getSubtitle());
+    existingCourse.setAuthor(updatedCourse.getAuthor());
+    existingCourse.setCategory(updatedCourse.getCategory());
+    
+    existingCourse.setThumbUrl(updatedCourse.getThumbUrl());
+    existingCourse.setPrice(updatedCourse.getPrice());
+    existingCourse.setIsFeatured(updatedCourse.getIsFeatured());
+
+    // Save the updated course.
+    return courseRepository.save(existingCourse);
+  }
+
+  @Override
+  public void deleteCourse(Integer id) {
+    try {
+      // Attempt to delete the course by ID.
+      courseRepository.deleteById(id);
+    } catch (EmptyResultDataAccessException ex) {
+      // If the course doesn't exist, throw a 404 Not Found exception.
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Course not found");
+    }
   }
 
 }

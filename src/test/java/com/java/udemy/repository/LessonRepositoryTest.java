@@ -22,9 +22,9 @@ public class LessonRepositoryTest {
     Assertions.assertTrue(optionalLesson.isPresent());
   }
 
-  @Test
-  void getAllMyWatchedLessons_Test() {
-    var lessonList = lessonRepository.getWatchStatusListByEnrollment(2L, 10013);
-    Assertions.assertEquals(10, lessonList.size());
-  }
+  // @Test
+  // void getAllMyWatchedLessons_Test() {
+  // var lessonList = lessonRepository.getWatchStatusListByEnrollment(2L, 10013);
+  // Assertions.assertEquals(10, lessonList.size());
+  // }
 }

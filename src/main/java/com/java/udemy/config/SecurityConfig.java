@@ -1,6 +1,10 @@
 package com.java.udemy.config;
 
 import org.springframework.security.authentication.AuthenticationManager;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +17,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+
+import com.cloudinary.Cloudinary;
 import com.java.udemy.config.security.AuthTokenFilter;
 
 @Configuration
@@ -54,6 +60,16 @@ public class SecurityConfig {
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.sessionManagement(s -> s.maximumSessions(2)).build();
+    }
+
+    @Bean
+    public Cloudinary getCloudinary() {
+        Map<String, Object> config = new HashMap<String, Object>();
+        config.put("cloud_name", "dfmuw2nsr");
+        config.put("api_key", "421119131944776");
+        config.put("api_secret", "YtgBpracaCQ_EGfqBuVD2f3jIJw");
+        config.put("secure", true);
+        return new Cloudinary(config);
     }
 
 }

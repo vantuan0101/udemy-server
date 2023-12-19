@@ -24,7 +24,7 @@ import lombok.Setter;
 public class EnrollProgress {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Integer id;
 
   @ManyToOne(optional = false, fetch = FetchType.LAZY)
   @JoinColumn(name = "enrollment_id")

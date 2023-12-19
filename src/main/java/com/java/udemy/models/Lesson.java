@@ -28,9 +28,8 @@ import lombok.Setter;
 public class Lesson {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  @Column(columnDefinition = "BINARY(16)")
-  private UUID id;
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer id;
 
   @Column(nullable = false)
   @NotBlank
@@ -48,6 +47,9 @@ public class Lesson {
   @NotNull
   @Column(nullable = false)
   private Integer position;
+
+  @NotNull
+  private String video_url;
 
   @ManyToOne(optional = false, fetch = FetchType.LAZY)
   @JoinColumn(name = "course_id")

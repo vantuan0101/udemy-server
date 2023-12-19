@@ -10,7 +10,7 @@ import com.java.udemy.models.OrderItem;
 import com.java.udemy.request.OrderItemRequest;
 
 @Repository
-public interface OrderItemRepository extends CrudRepository<OrderItem, Long> {
+public interface OrderItemRepository extends CrudRepository<OrderItem, Integer> {
 
   @Query("SELECT new com.java.udemy.request.OrderItemRequest(o.id, c.title, c.price) from OrderItem o " +
       "INNER JOIN Course c on o.course.id = c.id where o.sale.transactionId = ?1")

@@ -28,6 +28,10 @@ spring:
     password: ${MYSQL_PASSWORD}
     url: jdbc:mysql://localhost:3306/udemy_dev?connectionTimeZone=UTC&useSSL=false
     username: root
+  servlet:
+      multipart:
+          max-file-size: 1GB
+          max-request-size: 1GB
   jpa:
     hibernate:
       ddl-auto: update #You may chnage to `NONE` in production

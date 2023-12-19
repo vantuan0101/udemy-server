@@ -35,14 +35,14 @@ public class Lesson {
   @NotBlank
   private String lessonName;
 
-  @NotBlank
-  @Column(nullable = false, unique = true, length = 20)
-  @Size(max = 20)
-  private String videokey;
+  // @NotBlank
+  // @Column(nullable = false, unique = true, length = 20)
+  // @Size(max = 20)
+  // private String videokey;
 
-  @NotNull
-  @ColumnDefault("0")
-  private Integer lengthSeconds;
+  // @NotNull
+  // @ColumnDefault("0")
+  // private Integer lengthSeconds;
 
   @NotNull
   @Column(nullable = false)
@@ -68,14 +68,33 @@ public class Lesson {
   }
 
   /* convert to mm:ss */
-  public String getLengthSeconds() {
-    return String.format("%02d:%02d", Duration.ofSeconds(this.lengthSeconds).toMinutesPart(),
-        Duration.ofSeconds(this.lengthSeconds).toSecondsPart());
-  }
+  // public String getLengthSeconds() {
+  // return String.format("%02d:%02d",
+  // Duration.ofSeconds(this.lengthSeconds).toMinutesPart(),
+  // Duration.ofSeconds(this.lengthSeconds).toSecondsPart());
+  // }
 
   @Override
   public int hashCode() {
     return getClass().hashCode();
   }
+
+  public Lesson(String lessonName, String video_url, Integer position, Course course) {
+    this.lessonName = lessonName;
+    this.video_url = video_url;
+    this.position = position;
+    this.course = course;
+  }
+
+  // public Lesson(String lessonName, String video_url, String videokey, Integer
+  // lengthSeconds,
+  // Integer position, Course course) {
+  // this.lessonName = lessonName;
+  // this.video_url = video_url;
+  // this.lengthSeconds = lengthSeconds;
+  // this.position = position;
+  // this.videokey = videokey;
+  // this.course = course;
+  // }
 
 }

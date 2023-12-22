@@ -2,7 +2,9 @@ package com.java.udemy.controllers;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -93,4 +95,15 @@ public class AuthController {
 
     }
 
+    @PostMapping(path = "/logout")
+    @ResponseStatus(value = HttpStatus.OK)
+    public ResponseEntity<String> logout(HttpSession httpSession) {
+        try {
+            httpSession.invalidate();
+            return ResponseEntity.ok().body("Logout Successfully");
+        } catch (Exception ex) {
+            throw new BadRequestException(ex.getMessage());
+        }
+
+    }
 }

@@ -35,12 +35,6 @@ public class UserService implements IUserService, UserDetailsService {
         return new UserDetailsImplement(user);
     }
 
-    /**
-     * Just return the user_id saved in Redis Store
-     *
-     * @param session session
-     * @return userId
-     */
     @Override
     public Integer getSessionUserId(@NotNull HttpSession session) {
         return (Integer) session.getAttribute(USERID);

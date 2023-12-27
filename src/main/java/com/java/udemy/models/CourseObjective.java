@@ -31,12 +31,19 @@ public class CourseObjective {
   @OnDelete(action = OnDeleteAction.CASCADE)
   private Course course;
 
+  @OneToOne(optional = false, fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  @JsonBackReference
+  private User user;
+
   @Size(max = 200)
   private String objective;
 
-  public CourseObjective(Course course, @Size(max = 200) String objective) {
+  public CourseObjective(Course course, User user, @Size(max = 200) String objective) {
     super();
     this.course = course;
+    this.user = user;
     this.objective = objective;
   }
 

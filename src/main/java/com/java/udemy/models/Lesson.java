@@ -1,21 +1,17 @@
 package com.java.udemy.models;
 
 import java.util.Objects;
-import java.util.UUID;
 
 import jakarta.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import org.hibernate.Hibernate;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
-import java.time.Duration;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -57,6 +53,12 @@ public class Lesson {
   @JsonBackReference
   private Course course;
 
+  @OneToOne(optional = false, fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  @OnDelete(action = OnDeleteAction.CASCADE)
+  @JsonBackReference
+  private User user;
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -79,11 +81,12 @@ public class Lesson {
     return getClass().hashCode();
   }
 
-  public Lesson(String lessonName, String video_url, Integer position, Course course) {
+  public Lesson(String lessonName, String video_url, Integer position, Course course, User user) {
     this.lessonName = lessonName;
     this.video_url = video_url;
     this.position = position;
     this.course = course;
+    this.user = user;
   }
 
   // public Lesson(String lessonName, String video_url, String videokey, Integer

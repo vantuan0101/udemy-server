@@ -110,7 +110,7 @@ public class CourseController {
     }
 
     @Secured({ "ROLE_TEACHER", "ROLE_ADMIN" })
-    @PutMapping("/{id}")
+    @PutMapping( path = "/{id}")
     @ResponseStatus(value = HttpStatus.OK)
     public Course updateCourse(@RequestBody CourseRequest request, @PathVariable Integer id,
             @NotNull HttpSession session) {
@@ -123,7 +123,7 @@ public class CourseController {
     }
 
     @Secured({ "ROLE_TEACHER", "ROLE_ADMIN" })
-    @DeleteMapping("/{id}")
+    @DeleteMapping( path = "/{id}")
     @ResponseStatus(value = HttpStatus.OK)
     public void deleteCourse(@PathVariable Integer id, @NotNull HttpSession session) {
         try {

@@ -1,5 +1,7 @@
 package com.java.udemy.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.MediaType;
@@ -45,9 +47,9 @@ public class SalesController {
   public GetItemsByTransactionIdResponse getItemsByTransactionId(@PathVariable String transactionId,
       @RequestParam(defaultValue = "0") Integer page) {
     try {
-      Slice<OrderItemRequest> itemsByTransactionId = salesService.findByTransactionIdEquals(transactionId, page);
+      List<Long> itemsByTransactionId = salesService.findByTransactionIdEquals(transactionId);
       GetItemsByTransactionIdResponse response = new GetItemsByTransactionIdResponse();
-      response.setGetItemsByTransactionId(itemsByTransactionId);
+      // response.setGetItemsByTransactionId(itemsByTransactionId);
       return response;
     } catch (Exception ex) {
       throw new BadRequestException(ex.getMessage());

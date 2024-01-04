@@ -40,6 +40,15 @@ public class OrderItem {
     this.course = course;
   }
 
+  // Thêm các getter cho courseId và transactionId
+  public Integer getCourseId() {
+    return course.getId();
+  }
+
+  public String getTransactionId() {
+    return sale.getTransactionId();
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)

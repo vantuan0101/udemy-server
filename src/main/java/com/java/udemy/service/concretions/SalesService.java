@@ -1,5 +1,7 @@
 package com.java.udemy.service.concretions;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,9 +31,8 @@ public class SalesService implements ISalesService {
   }
 
   @Override
-  public Slice<OrderItemRequest> findByTransactionIdEquals(String transactionId, Integer page) {
-    Slice<OrderItemRequest> itemsByTransactionId = orderItemRepository.findByTransactionIdEquals(transactionId,
-        PageRequest.of(page, 10));
+  public List<Long> findByTransactionIdEquals(String transactionId) {
+    List<Long> itemsByTransactionId = orderItemRepository.findByTransactionIdEquals(transactionId);
     return itemsByTransactionId;
   }
 }
